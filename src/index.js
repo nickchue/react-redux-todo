@@ -1,6 +1,8 @@
 import React from 'react';
 import ReactDom from 'react-dom';
 import { createStore, combineReducers } from 'redux';
+import { Provider } from 'react-redux';
+import { PropTypes } from 'prop-types';
 
 const todo = (state, action) => {
   switch(action.type) {
@@ -56,8 +58,6 @@ const todoApp = combineReducers({
   visibilityFilter
 });
 
-const store = createStore(todoApp);
-
 const Link = ({
   active,
   children,
@@ -80,6 +80,7 @@ const Link = ({
 
 class FilterLink extends React.Component {
   componentDidMount() {
+    const { store } = this.context;
     this.unsubscribe = store.subscribe(() =>
       this.forceUpdate()
     )
@@ -91,6 +92,7 @@ class FilterLink extends React.Component {
 
   render() {
     const props = this.props;
+    const { store } = this.context;
     const state = store.getState();
 
     return (
@@ -109,6 +111,9 @@ class FilterLink extends React.Component {
       </Link>
     )
   }
+}
+FilterLink.contextTypes = {
+  store: PropTypes.object
 }
 
 const Footer = () => (
@@ -166,7 +171,8 @@ const TodoList = ({
   </ul>
 );
 
-const AddTodo = () => {
+let nextTodoId = 0;
+const AddTodo = (props, { store }) => {
   let input;
 
   return (
@@ -187,6 +193,9 @@ const AddTodo = () => {
     </div>
   )
 };
+AddTodo.contextTypes = {
+  store: PropTypes.object
+}
 
 const getVisibleTodos = (
   todos,
@@ -206,6 +215,8 @@ const getVisibleTodos = (
 
 class VisibleTodoList extends React.Component {
   componentDidMount() {
+    const { store } = this.context;
+
     this.unsubscribe = store.subscribe(() =>
       this.forceUpdate()
     )
@@ -217,6 +228,7 @@ class VisibleTodoList extends React.Component {
 
   render() {
     const props = this.props;
+    const { store } = this.context;
     const state = store.getState();
 
     return (
@@ -237,8 +249,10 @@ class VisibleTodoList extends React.Component {
     )
   }
 }
+VisibleTodoList.contextTypes = {
+  store: PropTypes.object
+}
 
-let nextTodoId = 0;
 const TodoApp = () => (
   <div>
     <AddTodo />
@@ -247,8 +261,9 @@ const TodoApp = () => (
   </div>
 );
 
-
 ReactDom.render(
-  <TodoApp />,
+  <Provider store={createStore(todoApp)}>
+    <TodoApp />
+  </Provider>,
   document.getElementById('root')
 )
