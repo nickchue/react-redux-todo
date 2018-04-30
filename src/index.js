@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDom from 'react-dom';
 import { createStore, combineReducers } from 'redux';
 import { Provider, connect } from 'react-redux';
-import { PropTypes } from 'prop-types';
 
 const todo = (state, action) => {
   switch(action.type) {
